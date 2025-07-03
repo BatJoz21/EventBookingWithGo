@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"practice.batjoz/event-booking-with-go/models"
+	"practice.batjoz/event-booking-with-go/utils"
 )
 
 func signup(context *gin.Context) {
@@ -39,5 +40,10 @@ func login(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "Login successful"})
+	token, err := utils.GenerateToken(user.Email, user.User_ID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
 }

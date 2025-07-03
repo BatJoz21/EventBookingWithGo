@@ -8,17 +8,16 @@ import (
 	"practice.batjoz/event-booking-with-go/models"
 )
 
-func createEvent(context *gin.Context) {
+func createEvent(context *gin.Context) {	
 	var event models.Event
 	err := context.ShouldBindJSON(&event)
-
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "could not parse the data"})
 		return
 	}
 
-	event.ID = 1
-	event.UserID = 1
+	user_id := context.GetInt64("user_id")
+	event.UserID = user_id
 	err = event.Save()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
