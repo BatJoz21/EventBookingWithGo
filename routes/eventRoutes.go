@@ -8,7 +8,7 @@ import (
 	"practice.batjoz/event-booking-with-go/models"
 )
 
-func createEvent(context *gin.Context) {	
+func createEvent(context *gin.Context) {
 	var event models.Event
 	err := context.ShouldBindJSON(&event)
 	if err != nil {
@@ -34,9 +34,15 @@ func updateEvent(context *gin.Context) {
 		return
 	}
 
-	_, err = models.GetEventByID(intID)
+	theEvent, err := models.GetEventByID(intID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "could not fetch the event"})
+		return
+	}
+
+	currentUserID := context.GetInt64("user_id")
+	if theEvent.UserID != currentUserID {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "user unauthorized"})
 		return
 	}
 
@@ -54,7 +60,7 @@ func updateEvent(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "Event updated successfully"})
+	context.JSON(http.StatusOK, gin.H{"message": "Event updated successfully", "Updated Event\n": updatedEvent})
 }
 
 func getEvent(context *gin.Context) {
@@ -94,6 +100,12 @@ func deleteEvent(context *gin.Context) {
 	event, err := models.GetEventByID(intID)
 	if err != nil {
 		context.JSON(http.StatusNoContent, gin.H{"message": "could not find the event"})
+	}
+
+	currentUserID := context.GetInt64("user_id")
+	if event.UserID != currentUserID {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "user is unauthorized"})
+		return
 	}
 
 	err = event.DeleteEventByID()
