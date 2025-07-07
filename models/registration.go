@@ -32,8 +32,8 @@ func (r Registration) SaveRegistration() error {
 	return nil
 }
 
-func (r Registration) DeleteRegistration() error {
-	query := `DELETE FROM registrations WHERE id = ?`
+func (r Registration) DeleteRegistration(user_ID int64) error {
+	query := `DELETE FROM registrations WHERE id = ? AND user_id = ?`
 
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
@@ -42,7 +42,7 @@ func (r Registration) DeleteRegistration() error {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(r.ID)
+	_, err = stmt.Exec(r.ID, user_ID)
 	if err != nil {
 		return err
 	}

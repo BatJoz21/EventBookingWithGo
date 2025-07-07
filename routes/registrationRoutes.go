@@ -48,7 +48,7 @@ func cancelRegistration(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "failed to get registration data"})
 	}
 
-	err = regis.DeleteRegistration()
+	err = regis.DeleteRegistration(context.GetInt64("user_id"))
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "failed to cancel registration data"})
 	}
